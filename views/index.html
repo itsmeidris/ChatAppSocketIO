@@ -584,9 +584,6 @@
                             </div>
                         </div>
                     </div>
-
-
-
                 </section>
                 <!--profile end -->
 
@@ -595,71 +592,88 @@
     </div>
     <script>
         // Define a variable 'socket' and initialize it with a new Socket.IO instance connected to the server at 'http://localhost:"3001'
-        const socket = window.io('http://localhost:3001');
-        // Define a variable 'msgForm' and assign it the form element with the id 'message-form'
-        const msgForm = document.querySelector('#message-form')
-        // Define a variable 'msgInput' and assign it the input element with the id 'message-input'
-        const msgInput = document.querySelector('#message-input')
-        // Define a variable 'msgContainer' and assign it the div element with the id 'messages-container'
-        const msgContainer = document.querySelector('#messages')
+const socket = window.io('http://localhost:3001');
+// Define a variable 'msgForm' and assign it the form element with the id 'message-form'
+const msgForm = document.querySelector('#message-form')
+// Define a variable 'msgInput' and assign it the input element with the id 'message-input'
+const msgInput = document.querySelector('#message-input')
+// Define a variable 'msgContainer' and assign it the div element with the id 'messages-container'
+const msgContainer = document.querySelector('#messages')
         
-        const userId = Math.floor(Math.random() * 1000000);
-        // Add an event listener to the 'msgForm' variable for the 'submit' event
-        msgForm.addEventListener('submit' ,(e) =>{
-            e.preventDefault();
-            // Check if the input field has a value
-            if(msgInput.value){
-                // Emit a 'chat message' event to the server with the input value
-                socket.emit('message' ,msgInput.value ,userId);
-                msgInput.value = '';
-            }
-        });
+const userId = Math.floor(Math.random() * 1000000);
+// Add an event listener to the 'msgForm' variable for the 'submit' event
+msgForm.addEventListener('submit' ,(e) =>{
+    e.preventDefault();
+    // Check if the input field has a value
+    if(msgInput.value){
+        // Emit a 'chat message' event to the server with the input value
+        socket.emit('message' ,msgInput.value ,userId);
+        msgInput.value = '';
+    }
+});
 
-        // Listen for 'chat message' events from the server
-        let emitMessages = () =>{
-            socket.on('message' ,(data) =>{
+// Listen for 'chat message' events from the server
+let emitMessages = () =>{
+    socket.on('message' ,(data) =>{
+        //Create a new list item to display the chat message
+        const msgContentContainer = document.createElement("div");
 
-                //Create a new list item to display the chat message
-                const msgContentContainer = document.createElement("li");
-                
-                // Set the text content of the list item to the received message
-                msgContentContainer.textContent = data.message;
+        const messageData = document.createElement('span');
+        messageData.textContent = data.message;
 
-                if (data.sender === userId) {
-                    myFunctionStyle(msgContentContainer, "#304CD5", "block", "white", "fit-content", "5px 12px", "10px", "10px", "normal", "left");
-                }else{
-                    myFunctionStyle(msgContentContainer, "#C743AF", "block", "white", "fit-content", "5px 12px", "10px", "10px", "normal", "right");
-                }
-                
-                
-                // Append the styled list item to the messages container
-                msgContainer.appendChild(msgContentContainer);
+        const messageTime = displayCurrentTime();
 
-                window.scrollTo(0, document.body.scrollHeight);
+        // Set the text content of the list item to the received message
+        msgContentContainer.appendChild(messageData);
+        msgContentContainer.appendChild(messageTime);
 
-
-            });
+        if (data.sender === userId) {
+            myFunctionStyle(msgContentContainer, "#304CD5", "block", "white", "fit-content", "5px 12px", "10px", "10px", "normal", "left");
+        }else{
+            myFunctionStyle(msgContentContainer, "#C743AF", "block", "white", "fit-content", "5px 12px", "10px", "10px", "normal", "right");
+            msgContentContainer.style.marginLeft = "auto";
         }
+                
+        // Append the styled list item to the messages container
+        msgContainer.appendChild(msgContentContainer);
+        window.scrollTo(0, document.body.scrollHeight);
+    });
+}
         
-        // // Added event listener
-        // socket.on("message", ({msg}) => {
-        // // Append a new paragraph element containing the message to the 'msgContainer' variable
-        // msgContainer.innerHTML += `<p> ${msg} </p>`;
-        // });
-        emitMessages();
+// // Added event listener
+// socket.on("message", ({msg}) => {
+// // Append a new paragraph element containing the message to the 'msgContainer' variable
+// msgContainer.innerHTML += `<p> ${msg} </p>`;
+// });
 
-        let myFunctionStyle = (element ,bgColor, display, color, width, padding, margin, borderRadius ,fontStyle ,textAlign) =>{
-            element.style.backgroundColor = bgColor;
-            element.style.display = display;
-            element.style.color = color;
-            element.style.width = width;
-            element.style.padding = padding;
-            element.style.margin = margin;
-            element.style.borderRadius = borderRadius;
-            element.style.fontStyle = fontStyle;
-            element.style.textAlign = textAlign;
-        };
-        </script>
+emitMessages();
+
+let myFunctionStyle = (element ,bgColor, display, color, width, padding, margin, borderRadius ,fontStyle ,textAlign) =>{
+    element.style.backgroundColor = bgColor;
+    element.style.display = display;
+    element.style.color = color;
+    element.style.width = width;
+    element.style.padding = padding;
+    element.style.margin = margin;
+    element.style.borderRadius = borderRadius;
+    element.style.fontStyle = fontStyle;
+    element.style.textAlign = textAlign;
+};
+
+//Function to display the current time and appending it to a Span element
+let displayCurrentTime = () =>{
+    let currentHour = new Date().getHours();
+    let currentMinute = new Date().getMinutes();
+
+    const messageTime = document.createElement('span');
+    messageTime.textContent = `${currentHour}:${currentMinute}`;
+    messageTime.style.fontSize = "10px"
+    messageTime.style.marginLeft = "15px";
+
+    return messageTime;
+}
+
+    </script>
         
 </body>
 
